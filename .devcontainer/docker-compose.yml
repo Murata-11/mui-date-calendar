@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: node:23-alpine3.20
+    container_name: mui-date-calendar
+    volumes:
+      - ../:/workspaces
+    ports:
+      - "3000:3000"
+    command: sleep infinity
