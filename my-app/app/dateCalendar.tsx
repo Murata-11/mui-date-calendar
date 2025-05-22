@@ -1,83 +1,104 @@
 // components/HolidayCalendarMock.tsx
-import { useState } from 'react'
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
-import {PickersDay, PickersDayProps} from '@mui/x-date-pickers/PickersDay'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Badge, Box, Typography } from '@mui/material'
-import dayjs, { Dayjs } from 'dayjs'
-import isSameDay from 'dayjs'
-import { v4 as uuidv4 } from 'uuid'
+import { useState } from "react";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Badge, Box, Typography } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs";
+import isSameDay from "dayjs";
+// 日本語ロケールをインポート
+import "dayjs/locale/ja";
 
-dayjs.extend(isSameDay)
+// 日本語ロケールを設定
+dayjs.locale("ja");
 
-type Holiday = {
-  id: string
-  date: string // 'YYYY-MM-DD'
-  name: string
-}
+dayjs.extend(isSameDay);
 
-export default function BasicDateCalendar() {
-  const [holidays, setHolidays] = useState<Holiday[]>([
-    {
-      id: uuidv4(),
-      date: dayjs().format('YYYY-MM-DD'),
-      name: '今日（モック）',
-    },
-  ])
+export type IProps = {
+  datas: Datas[];
+  onMonthChange?: (date: Dayjs) => void;
+  onYearChange?: (date: Dayjs) => void;
+  onChangeCeate?: (date: Dayjs) => void;
+  onChangeDelete?: (date: Dayjs) => void;
+};
+type Datas = {
+  date: string; // 'YYYY-MM-DD'
+  updated_at: string; // 'YYYY-MM-DD'
+};
+
+export default function BasicDateCalendar(props: IProps) {
+  const [datas, setDatas] = useState<Datas[]>(props.datas ?? []);
 
   const isHoliday = (date: Dayjs) =>
-    holidays.find(h => dayjs(h.date).isSame(date, 'day'))
+    datas.find((h) => dayjs(h.date).isSame(date, "day"));
 
-    const toggleHoliday = (date: Dayjs | null) => {
-    if (!date) return // nullチェック
+  const toggleHoliday = (date: Dayjs | null) => {
+    if (!date) return; // nullチェック
 
-    const existing = isHoliday(date)
+    const existing = isHoliday(date);
     if (existing) {
-        // 削除
-        setHolidays(holidays.filter(h => h.id !== existing.id))
+      // 削除
+      if (props.onChangeDelete) props.onChangeDelete(date);
+      setDatas(datas.filter((h) => h.date !== existing.date));
     } else {
-        // 追加
-        setHolidays([
-        ...holidays,
+      // 追加
+      if (props.onChangeCeate) props.onChangeCeate(date);
+      setDatas([
+        ...datas,
         {
-            id: uuidv4(),
-            date: date.format('YYYY-MM-DD'),
-            name: '休日（モック）',
+          date: date.format("YYYY-MM-DD"),
+          updated_at: dayjs().format("YYYY-MM-DD"),
         },
-        ])
+      ]);
     }
-    console.log(holidays)
-    }
+    console.log(datas);
+  };
+
+  // 月が変わったときのAPI呼び出し例
+  const handleMonthChange = (date: Dayjs) => {
+    if (props.onMonthChange) props.onMonthChange(date);
+  };
+
+  // 年が変わったときのAPI呼び出し例
+  const handleYearChange = (date: Dayjs) => {
+    if (props.onYearChange) props.onYearChange(date);
+  };
 
   function CustomDay(props: PickersDayProps) {
-    const { day, ...other } = props
-    const holiday = isHoliday(day)
+    const { day, outsideCurrentMonth, ...other } = props;
+    const holiday = isHoliday(day);
+
+    // // 前後月の日付には印を付けない
+    // if (outsideCurrentMonth) {
+    //   return <PickersDay {...props} />;
+    // }
 
     return (
       <Badge
         key={day.toString()}
         overlap="circular"
-        color={holiday ? 'error' : 'default'}
-        variant={holiday ? 'dot' : 'standard'}
+        color={holiday ? "error" : "default"}
+        variant={holiday ? "dot" : "standard"}
       >
-        <PickersDay {...other} day={day} />
+        {/* <PickersDay {...props} {...other} day={day} /> */}
+        <PickersDay {...props} day={day} />
       </Badge>
-    )
+    );
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ p: 4, maxWidth: 400, margin: 'auto' }}>
-        <Typography variant="h5" gutterBottom>📅 モック休日カレンダー</Typography>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ja">
+      <Box sx={{ p: 4, maxWidth: 500, margin: "auto" }}>
         <DateCalendar
           onChange={toggleHoliday}
           slots={{ day: CustomDay }}
+          onMonthChange={handleMonthChange}
+          onYearChange={handleYearChange}
+          shouldDisableDate={(date) => date.isBefore(dayjs(), "day")}
+          showDaysOutsideCurrentMonth
         />
-        <Typography variant="body2" mt={2}>
-          日付をクリックで <b>追加・削除</b>（モックデータ）します。
-        </Typography>
       </Box>
     </LocalizationProvider>
-  )
+  );
 }

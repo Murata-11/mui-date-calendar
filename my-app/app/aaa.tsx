@@ -1,94 +1,105 @@
-// import { useEffect, useState } from 'react'
-// import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
-// import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay'
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-// import { Badge, Box, Typography, CircularProgress } from '@mui/material'
-// import dayjs, { Dayjs } from 'dayjs'
+"use client";
 
-// type Holiday = {
-//   id: string
-//   date: string
-//   name: string
-// }
+import * as React from "react";
+import BasicDateCalendar from "./dateCalendar";
+import { IProps } from "./dateCalendar";
+import { Dayjs } from "dayjs";
+import { Box, Card } from "@mui/material";
 
-// export default function HolidayCalendar() {
-//   const [holidays, setHolidays] = useState<Holiday[]>([])
-//   const [loading, setLoading] = useState(true)
+const datas: IProps = {
+  datas: [
+    {
+      date: "2025-05-01",
+      updated_at: "2023-10-01",
+    },
+    {
+      date: "2025-05-02",
+      updated_at: "2023-10-01",
+    },
+  ],
+};
 
-//   // APIから休日取得
-//   useEffect(() => {
-//     fetch('/api/holidays')
-//       .then(res => res.json())
-//       .then(data => {
-//         setHolidays(data)
-//         setLoading(false)
-//       })
-//   }, [])
+export default function Home() {
+  // 月が変わったときのAPI呼び出し例
+  const handleMonthChange = async (date: Dayjs) => {
+    // ここでAPI呼び出し
+    // 例: await fetch(`/api/holidays?month=${date.format('YYYY-MM')}`);
+    console.log("月が変わりました:", date.format("YYYY-MM"));
+    const start = date.subtract(2, "month");
+    const end = date.add(2, "month");
+    console.log(
+      `2カ月前: ${start.format("YYYY-MM")}, 2カ月後: ${end.format("YYYY-MM")}`
+    );
+  };
 
-//   // 休日判定
-//   const isHoliday = (date: Dayjs) =>
-//     holidays.some(h => dayjs(h.date).isSame(date, 'day'))
+  // 年が変わったときのAPI呼び出し例
+  const handleYearChange = async (date: Dayjs) => {
+    // ここでAPI呼び出し
+    // 例: await fetch(`/api/holidays?year=${date.format('YYYY')}`);
+    console.log("年が変わりました:", date.format("YYYY-MM"));
+    const start = date.subtract(2, "month");
+    const end = date.add(2, "month");
+    console.log(
+      `2カ月前: ${start.format("YYYY-MM")}, 2カ月後: ${end.format("YYYY-MM")}`
+    );
+  };
 
-//   // 休日追加・削除API呼び出し
-//   const toggleHoliday = async (date: Dayjs) => {
-//     const dateStr = date.format('YYYY-MM-DD')
-//     if (isHoliday(date)) {
-//       // 削除
-//       await fetch('/api/holidays', {
-//         method: 'DELETE',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ date: dateStr }),
-//       })
-//       setHolidays(holidays.filter(h => h.date !== dateStr))
-//     } else {
-//       // 追加
-//       const res = await fetch('/api/holidays', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ date: dateStr }),
-//       })
-//       const newHoliday = await res.json()
-//       setHolidays([...holidays, newHoliday])
-//     }
-//   }
-
-//   // カスタムDayコンポーネント
-//   function CustomDay(props: PickersDayProps) {
-//     const { day, ...other } = props
-//     const holiday = isHoliday(day)
-
-//     return (
-//       <Badge
-//         key={day.toString()}
-//         overlap="circular"
-//         color={holiday ? 'error' : 'default'}
-//         variant={holiday ? 'dot' : 'standard'}
-//       >
-//         <PickersDay {...other} day={day} />
-//       </Badge>
-//     )
-//   }
-
-//   if (loading) {
-//     return (
-//       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
-//         <CircularProgress />
-//       </Box>
-//     )
-//   }
-
-//   return (
-//     <LocalizationProvider dateAdapter={AdapterDayjs}>
-//       <Box sx={{ p: 4, maxWidth: 400, mx: 'auto' }}>
-//         <Typography variant="h5" gutterBottom>
-//           📅 休日カレンダー (API連携モック)
-//         </Typography>
-//         <DateCalendar onChange={toggleHoliday} slots={{ day: CustomDay }} />
-//         <Typography variant="body2" mt={2}>
-//           日付クリックで <b>追加・削除</b> できます。
-//         </Typography>
-//       </Box>
-//     </LocalizationProvider>
-//   )
-// }
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+      width="100vw"
+      position="fixed"
+      top={0}
+      left={0}
+      // gap={} // カード間のスペースを追加
+    >
+      <Box
+        flex={1}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Card
+          sx={{
+            width: 550,
+            height: 650,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <a>aa</a>
+        </Card>
+      </Box>
+      <Box
+        flex={1}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Card
+          sx={{
+            width: 550,
+            height: 650,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ transform: "scale(1.5)" }}>
+            <BasicDateCalendar
+              datas={datas.datas}
+              onMonthChange={handleMonthChange}
+              onYearChange={handleYearChange}
+            />
+          </Box>
+        </Card>
+      </Box>
+    </Box>
+  );
+}
